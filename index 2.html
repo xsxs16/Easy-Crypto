@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Archiv & Spenden</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0a0a0a;
+            --text-color: #e0e0e0;
+            --primary-color: #00ff41;
+            --accent-color: #1a1a1a;
+            --border-color: #333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Scanline Effect */
+        body::before {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 100;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+            opacity: 0.1;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+        }
+
+        .archive-btn {
+            position: fixed;
+            top: 2rem;
+            left: 2rem;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            z-index: 1000;
+            text-transform: uppercase;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.2);
+        }
+
+        .archive-btn:hover {
+            background: var(--primary-color);
+            color: #000;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.5);
+        }
+
+        h1 {
+            font-size: 4rem;
+            margin-bottom: 2rem;
+            letter-spacing: -2px;
+            text-transform: uppercase;
+            color: #fff;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        .hero-text {
+            font-size: 1.25rem;
+            max-width: 600px;
+            border-left: 3px solid var(--primary-color);
+            padding-left: 1.5rem;
+            text-align: left;
+            margin-bottom: 2rem;
+        }
+
+        .sub-text {
+            color: var(--primary-color);
+            opacity: 0.8;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.9rem;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 2000;
+            padding: 2rem;
+        }
+
+        .modal-content {
+            background: var(--accent-color);
+            border: 1px solid var(--border-color);
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            color: var(--text-color);
+            cursor: pointer;
+            font-size: 1.5rem;
+        }
+
+        .pdf-list {
+            margin-top: 2rem;
+        }
+
+        .pdf-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .pdf-item:hover {
+            border-color: var(--primary-color);
+            background: rgba(0, 255, 65, 0.05);
+        }
+
+        .pdf-item a {
+            color: var(--primary-color);
+            text-decoration: none;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            border: 1px solid var(--primary-color);
+            padding: 0.25rem 0.5rem;
+        }
+
+        /* Donations */
+        .donation-section {
+            padding: 5rem 0;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .donation-section h2 {
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+        }
+
+        .donation-disclaimer {
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 3rem;
+        }
+
+        .crypto-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .crypto-card {
+            background: var(--accent-color);
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            text-align: left;
+        }
+
+        .crypto-label {
+            color: var(--primary-color);
+            font-size: 0.8rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .crypto-address {
+            font-size: 0.75rem;
+            word-break: break-all;
+            color: #ccc;
+            background: #000;
+            padding: 0.5rem;
+            display: block;
+            margin-top: 0.5rem;
+            border: 1px dashed #444;
+        }
+
+        .copy-btn {
+            margin-top: 0.5rem;
+            background: transparent;
+            border: 1px solid #444;
+            color: #888;
+            padding: 0.2rem 0.5rem;
+            font-size: 0.7rem;
+            cursor: pointer;
+        }
+
+        .copy-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5rem; }
+            .hero-text { font-size: 1rem; }
+            .archive-btn { top: 1rem; left: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <button class="archive-btn" onclick="openModal()">ARCHIV_ÖFFNEN</button>
+
+    <div class="container">
+        <header>
+            <h1>Willkommen!</h1>
+            <div class="hero-text">
+                Hier findest du regelmäßig neue, kostenlose PDFs zu Technik und Lernen.
+            </div>
+            <div class="sub-text">
+                Alle Inhalte sind frei zugänglich – Spenden sind freiwillig.
+            </div>
+        </header>
+
+        <section class="donation-section">
+            <h2>FREIWILLIGE SPENDE</h2>
+            <p class="donation-disclaimer">
+                Spenden sind eine ausdrücklich freiwillige Unterstützung für das Projekt.
+            </p>
+
+            <div class="crypto-grid">
+                <div class="crypto-card">
+                    <span class="crypto-label">ETHEREUM (ETH)</span>
+                    <span class="crypto-address" id="eth-addr">0x28eEfFD722F3e209189cbB102211FEaE8879eC98</span>
+                    <button class="copy-btn" onclick="copyToClipboard('eth-addr')">KOPIEREN</button>
+                </div>
+                <div class="crypto-card">
+                    <span class="crypto-label">SOLANA (SOL)</span>
+                    <span class="crypto-address" id="sol-addr">HtfwXYPBsqsb51ZqADXP7Tm5mRwAaPz4ErZFRahxcErY</span>
+                    <button class="copy-btn" onclick="copyToClipboard('sol-addr')">KOPIEREN</button>
+                </div>
+                <div class="crypto-card">
+                    <span class="crypto-label">BITCOIN (BTC)</span>
+                    <span class="crypto-address" id="btc-addr">bc1q4ug9y65u7kwz9rt2j7jg5h9r2snuzrlzkmn0vf</span>
+                    <button class="copy-btn" onclick="copyToClipboard('btc-addr')">KOPIEREN</button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Modal -->
+    <div id="pdfModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <h3 style="color: var(--primary-color); text-transform: uppercase;">PDF_DATENBANK</h3>
+            <div class="pdf-list">
+                <div class="pdf-item">
+                    <div>
+                        <strong style="color: #007bff;">Crypto Guide (DE)</strong><br>
+                        <small style="color: #666;">Deutsch</small>
+                    </div>
+                    <a href="crypto-guide-de.pdf" target="_blank">ANSEHEN / DOWNLOAD</a>
+                </div>
+                <div class="pdf-item">
+                    <div>
+                        <strong style="color: #007bff;">Crypto Guide (EN)</strong><br>
+                        <small style="color: #666;">English</small>
+                    </div>
+                    <a href="crypto-guide-en.pdf" target="_blank">ANSEHEN / DOWNLOAD</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openModal() {
+            document.getElementById('pdfModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('pdfModal').style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            let modal = document.getElementById('pdfModal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+
+        function copyToClipboard(id) {
+            const text = document.getElementById(id).innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = event.target;
+                const originalText = btn.innerText;
+                btn.innerText = 'KOPIERT!';
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>
