@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wissens-Archiv & Support</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0a0a0a;
+            --text-color: #e0e0e0;
+            --primary-color: #00ff41;
+            --accent-color: #1a1a1a;
+            --border-color: #333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Scanline Effect */
+        body::before {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 100;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+            opacity: 0.1;
+        }
+
+        /* Container für zentrierten Inhalt */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* --- HOME VIEW --- */
+        #home-view {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 90vh;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            letter-spacing: -2px;
+            text-transform: uppercase;
+            color: #fff;
+            text-shadow: 0 0 10px rgba(0, 255, 65, 0.4);
+        }
+
+        .intro-text {
+            font-size: 1.2rem;
+            max-width: 600px;
+            color: #888;
+            margin-bottom: 3rem;
+            border-left: 2px solid var(--primary-color);
+            padding-left: 1rem;
+            text-align: left;
+        }
+
+        /* Guide Auswahl Buttons */
+        .guide-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .guide-btn {
+            background: transparent;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 1.5rem;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .guide-btn:hover {
+            background: var(--primary-color);
+            color: #000;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.4);
+        }
+
+        .guide-btn::after {
+            content: ">> READ";
+            position: absolute;
+            right: 1.5rem;
+            opacity: 0.5;
+        }
+
+        /* --- READER VIEW (Die "neue" Seite) --- */
+        #reader-view {
+            display: none; /* Standardmäßig ausgeblendet */
+            padding-top: 2rem;
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin-bottom: 2rem;
+            color: #888;
+            text-decoration: none;
+            cursor: pointer;
+            border: 1px solid #333;
+            padding: 0.5rem 1rem;
+            transition: 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .back-btn:hover {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .content-box {
+            background: var(--accent-color);
+            border: 1px solid var(--border-color);
+            padding: 2.5rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+        }
+
+        .guide-headline {
+            color: var(--primary-color);
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid #333;
+            padding-bottom: 1rem;
+            text-transform: uppercase;
+        }
+
+        .chapter {
+            margin-bottom: 2rem;
+        }
+
+        .chapter h3 {
+            color: #fff;
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        .chapter p {
+            color: #ccc;
+            margin-left: 1rem;
+            border-left: 1px solid #444;
+            padding-left: 1rem;
+            white-space: pre-line; /* Damit Zeilenumbrüche funktionieren */
+        }
+
+        /* --- SPENDEN BEREICH (Im Reader View) --- */
+        .donation-footer {
+            margin-top: 4rem;
+            padding: 2rem;
+            border: 1px dashed var(--border-color);
+            text-align: center;
+            background: rgba(0,0,0,0.3);
+        }
+
+        .donation-footer h4 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+
+        .crypto-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+            text-align: left;
+        }
+
+        .crypto-item {
+            background: #000;
+            padding: 1rem;
+            border: 1px solid #333;
+        }
+
+        .crypto-name {
+            color: #fff;
+            font-size: 0.8rem;
+            display: block;
+            margin-bottom: 0.3rem;
+        }
+
+        .crypto-key {
+            font-size: 0.7rem;
+            color: #777;
+            word-break: break-all;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .copy-link {
+            font-size: 0.7rem;
+            color: var(--primary-color);
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2rem; }
+            .container { padding: 1rem; }
+            .content-box { padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <div id="home-view">
+            <h1>WISSENS_ARCHIV</h1>
+            <div class="intro-text">
+                Willkommen im Archiv. Hier findest du kostenlose Guides zu Technik, Krypto und Sicherheit.
+                <br><br>
+                Wähle ein Thema, um den Inhalt zu laden.
+            </div>
+
+            <div class="guide-list">
+                <button class="guide-btn" onclick="openGuide('de')">
+                    Crypto Guide [DEUTSCH]
+                </button>
+                
+                <button class="guide-btn" onclick="openGuide('en')">
+                    Crypto Guide [ENGLISH]
+                </button>
+            </div>
+        </div>
+
+
+        <div id="reader-view">
+            <div onclick="goHome()" class="back-btn">&lt; ZURÜCK ZUR ÜBERSICHT</div>
+
+            <div id="content-de" class="content-box" style="display:none;">
+                <h2 class="guide-headline">Crypto Guide für Anfänger (DE)</h2>
+                
+                <div class="chapter">
+                    <h3>1. Was ist Kryptowährung?</h3>
+                    <p>Digitale Währung, die online funktioniert. Kein Bankkonto nötig. Beispiele: Bitcoin (BTC), Ethereum (ETH).</p>
+                </div>
+                <div class="chapter">
+                    <h3>2. Wie funktioniert die Blockchain?</h3>
+                    <p>Eine Kette von Datenblöcken. Jede Transaktion ist sicher gespeichert. Niemand kann sie einfach ändern.</p>
+                </div>
+                <div class="chapter">
+                    <h3>3. Wallets – Deine digitale Geldbörse</h3>
+                    <p>Hot Wallet: Online, einfach (z. B. MetaMask).
+                    Cold Wallet: Offline, sicher (z. B. Ledger).</p>
+                </div>
+                <div class="chapter">
+                    <h3>4. Sicherheitstipps</h3>
+                    <p>Aktiviere immer die 2-Faktor-Authentifizierung (2FA).
+                    Teile niemals deine Private Keys oder Seed Phrases.
+                    Klicke nicht auf verdächtige Links in E-Mails oder DMs.</p>
+                </div>
+                <div class="chapter">
+                    <h3>5. Fazit</h3>
+                    <p>Kryptowährungen sind spannend, aber riskant. Investiere nur Geld, das du verlieren kannst.</p>
+                </div>
+                <p style="color: #ff4141; text-align: center; margin-top: 2rem;">NUR FÜR DEN PRIVATEN GEBRAUCH</p>
+            </div>
+
+            <div id="content-en" class="content-box" style="display:none;">
+                <h2 class="guide-headline">Crypto Beginner Guide (EN)</h2>
+                
+                <div class="chapter">
+                    <h3>1. What is Cryptocurrency?</h3>
+                    <p>Digital money that works online. No bank account needed. Examples: Bitcoin (BTC), Ethereum (ETH).</p>
+                </div>
+                <div class="chapter">
+                    <h3>2. How does Blockchain work?</h3>
+                    <p>A chain of data blocks. Every transaction is secure and stored. Nobody can easily change it.</p>
+                </div>
+                <div class="chapter">
+                    <h3>3. Wallets – Your Digital Wallet</h3>
+                    <p>Hot Wallet: Online, easy (e.g., MetaMask).
+                    Cold Wallet: Offline, safe (e.g., Ledger).</p>
+                </div>
+                <div class="chapter">
+                    <h3>4. Safety Tips</h3>
+                    <p>Always enable 2-Factor Authentication (2FA).
+                    Never share your Private Keys or Seed Phrases.
+                    Do not click on suspicious links.</p>
+                </div>
+                <div class="chapter">
+                    <h3>5. Conclusion</h3>
+                    <p>Cryptocurrencies are exciting but risky. Only invest money you can afford to lose.</p>
+                </div>
+                <p style="color: #ff4141; text-align: center; margin-top: 2rem;">ONLY FOR PERSONAL USE</p>
+            </div>
+
+            <div class="donation-footer">
+                <h4>Support the Project</h4>
+                <p style="font-size: 0.9rem; color: #888;">Wenn dir dieser Guide geholfen hat, ist eine Spende willkommen.</p>
+                
+                <div class="crypto-list">
+                    <div class="crypto-item">
+                        <span class="crypto-name">ETHEREUM (ETH)</span>
+                        <span class="crypto-key" id="eth-addr">0x28eEfFD722F3e209189cbB102211FEaE8879eC98</span>
+                        <span class="copy-link" onclick="copyText('eth-addr', this)">Adresse kopieren</span>
+                    </div>
+                    <div class="crypto-item">
+                        <span class="crypto-name">SOLANA (SOL)</span>
+                        <span class="crypto-key" id="sol-addr">HtfwXYPBsqsb51ZqADXP7Tm5mRwAaPz4ErZFRahxcErY</span>
+                        <span class="copy-link" onclick="copyText('sol-addr', this)">Adresse kopieren</span>
+                    </div>
+                    <div class="crypto-item">
+                        <span class="crypto-name">BITCOIN (BTC)</span>
+                        <span class="crypto-key" id="btc-addr">bc1q4ug9y65u7kwz9rt2j7jg5h9r2snuzrlzkmn0vf</span>
+                        <span class="copy-link" onclick="copyText('btc-addr', this)">Adresse kopieren</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        // Funktion zum Öffnen eines Guides
+        function openGuide(lang) {
+            // 1. Home View ausblenden
+            document.getElementById('home-view').style.display = 'none';
+            
+            // 2. Reader View anzeigen
+            document.getElementById('reader-view').style.display = 'block';
+
+            // 3. Alle Inhalte verstecken, dann den richtigen zeigen
+            document.getElementById('content-de').style.display = 'none';
+            document.getElementById('content-en').style.display = 'none';
+
+            if(lang === 'de') {
+                document.getElementById('content-de').style.display = 'block';
+            } else if(lang === 'en') {
+                document.getElementById('content-en').style.display = 'block';
+            }
+
+            // Nach oben scrollen
+            window.scrollTo(0, 0);
+        }
+
+        // Funktion: Zurück zur Übersicht
+        function goHome() {
+            document.getElementById('reader-view').style.display = 'none';
+            document.getElementById('home-view').style.display = 'flex'; // Flex, damit Zentrierung stimmt
+        }
+
+        // Kopier-Funktion
+        function copyText(elementId, btnElement) {
+            const text = document.getElementById(elementId).innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = btnElement.innerText;
+                btnElement.innerText = ">> KOPIERT! <<";
+                btnElement.style.color = "#fff";
+                
+                setTimeout(() => {
+                    btnElement.innerText = originalText;
+                    btnElement.style.color = "";
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>
