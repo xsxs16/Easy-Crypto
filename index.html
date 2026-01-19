@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Archiv & Spenden</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0a0a0a;
+            --text-color: #e0e0e0;
+            --primary-color: #00ff41;
+            --accent-color: #1a1a1a;
+            --border-color: #333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            overflow-x: hidden; /* Verhindert Scrollen der Hauptseite wenn Modal offen */
+        }
+
+        /* Scanline Effect */
+        body::before {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 9999; /* Über allem */
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+            opacity: 0.1;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* --- STARTSEITE --- */
+        header {
+            height: 90vh; /* Fast volle Höhe */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .archive-btn {
+            position: fixed;
+            top: 2rem;
+            left: 2rem;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            z-index: 1000;
+            text-transform: uppercase;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.2);
+        }
+
+        .archive-btn:hover {
+            background: var(--primary-color);
+            color: #000;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.5);
+        }
+
+        h1 {
+            font-size: 4rem;
+            margin-bottom: 2rem;
+            letter-spacing: -2px;
+            text-transform: uppercase;
+            color: #fff;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        .hero-text {
+            font-size: 1.25rem;
+            max-width: 600px;
+            border-left: 3px solid var(--primary-color);
+            padding-left: 1.5rem;
+            text-align: left;
+            margin-bottom: 2rem;
+        }
+
+        /* --- SPENDEN (HOME) --- */
+        .donation-section {
+            padding: 5rem 0;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .donation-section h2 {
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+        }
+
+        .crypto-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .crypto-card {
+            background: var(--accent-color);
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            text-align: left;
+        }
+
+        .crypto-label {
+            color: var(--primary-color);
+            font-size: 0.8rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .crypto-address {
+            font-size: 0.75rem;
+            word-break: break-all;
+            color: #ccc;
+            background: #000;
+            padding: 0.5rem;
+            display: block;
+            margin-top: 0.5rem;
+            border: 1px dashed #444;
+        }
+
+        .copy-btn {
+            margin-top: 0.5rem;
+            background: transparent;
+            border: 1px solid #444;
+            color: #888;
+            padding: 0.2rem 0.5rem;
+            font-size: 0.7rem;
+            cursor: pointer;
+        }
+
+        .copy-btn:hover { border-color: var(--primary-color); color: var(--primary-color); }
+
+
+        /* --- ARCHIV MODAL (Das Auswahl-Menü) --- */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 2000;
+            padding: 2rem;
+        }
+
+        .modal-content {
+            background: var(--accent-color);
+            border: 1px solid var(--primary-color);
+            max-width: 600px;
+            margin: 5rem auto;
+            padding: 2rem;
+            position: relative;
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.1);
+        }
+
+        .close-modal {
+            position: absolute; top: 1rem; right: 1rem;
+            color: #fff; cursor: pointer; font-size: 1.5rem;
+        }
+        .close-modal:hover { color: var(--primary-color); }
+
+        /* Buttons im Archiv */
+        .file-btn {
+            display: block;
+            width: 100%;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            background: #000;
+            border: 1px solid #333;
+            color: var(--primary-color);
+            text-align: left;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            text-transform: uppercase;
+        }
+
+        .file-btn:hover {
+            border-color: var(--primary-color);
+            background: rgba(0, 255, 65, 0.05);
+            padding-left: 2rem; /* Kleiner Animationseffekt */
+        }
+
+
+        /* --- READER OVERLAY (Die "neue Seite" zum Lesen) --- */
+        #reader-overlay {
+            display: none; /* Standardmäßig versteckt */
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--bg-color);
+            z-index: 3000; /* Über dem Modal */
+            overflow-y: auto; /* Scrollbar für den langen Text */
+            padding: 2rem;
+        }
+
+        .reader-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding-bottom: 5rem;
+        }
+
+        .back-to-archive {
+            display: inline-block;
+            margin-bottom: 2rem;
+            color: #888;
+            border: 1px solid #333;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+        }
+        .back-to-archive:hover { border-color: var(--primary-color); color: var(--primary-color); }
+
+        .text-content {
+            background: #111;
+            padding: 3rem;
+            border: 1px solid #333;
+            margin-bottom: 3rem;
+        }
+
+        .text-content h2 { color: var(--primary-color); margin-bottom: 2rem; border-bottom: 1px solid #333; padding-bottom: 1rem; }
+        .text-content h3 { color: #fff; margin-top: 2rem; margin-bottom: 0.5rem; }
+        .text-content p { color: #ccc; margin-bottom: 1rem; }
+        .text-content ul { padding-left: 1.5rem; color: #bbb; }
+        .text-content li { margin-bottom: 0.5rem; }
+
+        /* Spenden im Reader */
+        .reader-donation {
+            text-align: center;
+            border-top: 1px dashed #444;
+            padding-top: 2rem;
+        }
+        .reader-donation h3 { color: #fff; margin-bottom: 1rem; }
+
+    </style>
+</head>
+<body>
+
+    <button class="archive-btn" onclick="openArchive()">ARCHIV_ÖFFNEN</button>
+
+    <div class="container">
+        <header>
+            <h1>Willkommen!</h1>
+            <div class="hero-text">
+                Hier findest du regelmäßig neue, kostenlose Guides zu Technik und Lernen.
+                <br><br>
+                Klicke oben links auf "ARCHIV", um die Texte zu lesen.
+            </div>
+        </header>
+
+        <section class="donation-section">
+            <h2>FREIWILLIGE SPENDE</h2>
+            <div class="crypto-grid">
+                <div class="crypto-card">
+                    <span class="crypto-label">ETHEREUM (ETH)</span>
+                    <span class="crypto-address" id="eth-main">0x28eEfFD722F3e209189cbB102211FEaE8879eC98</span>
+                    <button class="copy-btn" onclick="copyToClipboard('eth-main')">KOPIEREN</button>
+                </div>
+                <div class="crypto-card">
+                    <span class="crypto-label">BITCOIN (BTC)</span>
+                    <span class="crypto-address" id="btc-main">bc1q4ug9y65u7kwz9rt2j7jg5h9r2snuzrlzkmn0vf</span>
+                    <button class="copy-btn" onclick="copyToClipboard('btc-main')">KOPIEREN</button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+
+    <div id="archiveModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeArchive()">&times;</span>
+            <h3 style="color: var(--primary-color); margin-bottom: 2rem; text-transform: uppercase;">DATEI AUSWÄHLEN:</h3>
+            
+            <button class="file-btn" onclick="openReader('de')">
+                > Crypto Guide für Anfänger (DE)
+            </button>
+            <button class="file-btn" onclick="openReader('en')">
+                > Crypto Beginner Guide (EN)
+            </button>
+
+        </div>
+    </div>
+
+
+    <div id="reader-overlay">
+        <div class="reader-container">
+            <div class="back-to-archive" onclick="closeReader()">
+                &lt; ZURÜCK ZUM ARCHIV
+            </div>
+
+            <div id="content-de" class="text-content" style="display:none;">
+                <h2>Crypto Guide für Anfänger (DE)</h2>
+                <h3>1. Was ist Kryptowährung?</h3>
+                <p>Digitale Währung, die online funktioniert. Kein Bankkonto nötig.</p>
+                
+                <h3>2. Wie funktioniert die Blockchain?</h3>
+                <p>Eine Kette von Datenblöcken. Jede Transaktion ist sicher und gespeichert. Niemand kann sie einfach ändern.</p>
+                
+                <h3>3. Wallets</h3>
+                <ul>
+                    <li><strong>Hot Wallet:</strong> Online, einfach, z. B. MetaMask</li>
+                    <li><strong>Cold Wallet:</strong> Offline, sicher, z. B. Ledger</li>
+                </ul>
+
+                <h3>4. Sicherheitstipps</h3>
+                <p>2-Faktor-Authentifizierung aktivieren. Private Keys niemals teilen. Vorsicht vor verdächtigen Links.</p>
+
+                <h3>5. Fazit</h3>
+                <p>Kryptowährungen sind spannend, aber riskant. Nur Geld investieren, das du entbehren kannst.</p>
+                
+                <p style="color:#ff4141; margin-top:2rem; text-align:center;">NUR FÜR PRIVATEN GEBRAUCH.</p>
+            </div>
+
+            <div id="content-en" class="text-content" style="display:none;">
+                <h2>Crypto Beginner Guide (EN)</h2>
+                <h3>1. What is Cryptocurrency?</h3>
+                <p>Digital money that works online. No bank account needed.</p>
+                
+                <h3>2. How does Blockchain work?</h3>
+                <p>A chain of data blocks. Every transaction is secure. Nobody can change it easily.</p>
+                
+                <h3>3. Wallets</h3>
+                <ul>
+                    <li><strong>Hot Wallet:</strong> Online, easy (e.g. MetaMask)</li>
+                    <li><strong>Cold Wallet:</strong> Offline, safe (e.g. Ledger)</li>
+                </ul>
+
+                <h3>4. Safety Tips</h3>
+                <p>Enable 2FA. Never share private keys. Watch out for scam links.</p>
+
+                <h3>5. Conclusion</h3>
+                <p>Crypto is risky. Only invest what you can lose.</p>
+                
+                <p style="color:#ff4141; margin-top:2rem; text-align:center;">ONLY FOR PERSONAL USE.</p>
+            </div>
+
+
+            <div class="reader-donation">
+                <h3>HAT DIR DER TEXT GEHOLFEN?</h3>
+                <p style="color: #888; margin-bottom: 2rem;">Unterstütze das Projekt mit einer Spende.</p>
+                
+                <div class="crypto-grid">
+                    <div class="crypto-card" style="background: #000;">
+                        <span class="crypto-label">ETHEREUM (ETH)</span>
+                        <span class="crypto-address" id="eth-read">0x28eEfFD722F3e209189cbB102211FEaE8879eC98</span>
+                        <button class="copy-btn" onclick="copyToClipboard('eth-read')">KOPIEREN</button>
+                    </div>
+                    <div class="crypto-card" style="background: #000;">
+                        <span class="crypto-label">SOLANA (SOL)</span>
+                        <span class="crypto-address" id="sol-read">HtfwXYPBsqsb51ZqADXP7Tm5mRwAaPz4ErZFRahxcErY</span>
+                        <button class="copy-btn" onclick="copyToClipboard('sol-read')">KOPIEREN</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <script>
+        // --- FUNKTIONEN ---
+
+        // Archiv öffnen (Menü)
+        function openArchive() {
+            document.getElementById('archiveModal').style.display = 'block';
+        }
+
+        // Archiv schließen
+        function closeArchive() {
+            document.getElementById('archiveModal').style.display = 'none';
+        }
+
+        // Reader öffnen (Text anzeigen)
+        function openReader(lang) {
+            // 1. Archiv schließen (damit es im Hintergrund weg ist)
+            document.getElementById('archiveModal').style.display = 'none';
+            
+            // 2. Reader Overlay anzeigen
+            document.getElementById('reader-overlay').style.display = 'block';
+            
+            // 3. Den richtigen Text einblenden
+            document.getElementById('content-de').style.display = 'none';
+            document.getElementById('content-en').style.display = 'none';
+            
+            if(lang === 'de') {
+                document.getElementById('content-de').style.display = 'block';
+            } else {
+                document.getElementById('content-en').style.display = 'block';
+            }
+
+            // Scroll nach oben
+            document.getElementById('reader-overlay').scrollTop = 0;
+        }
+
+        // Reader schließen (Zurück zum Archiv Menü)
+        function closeReader() {
+            document.getElementById('reader-overlay').style.display = 'none';
+            // Automatisch wieder das Archiv öffnen, damit man den nächsten Text wählen kann
+            document.getElementById('archiveModal').style.display = 'block';
+        }
+
+        // Kopier-Funktion
+        function copyToClipboard(id) {
+            const text = document.getElementById(id).innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                // Wir suchen den Button, der geklickt wurde (event.target)
+                // Da event in inline-Handlern global ist, funktioniert das
+                const btn = event.target; 
+                const originalText = btn.innerText;
+                
+                btn.innerText = 'KOPIERT!';
+                btn.style.color = '#00ff41';
+                btn.style.borderColor = '#00ff41';
+
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.style.color = '';
+                    btn.style.borderColor = '';
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>
