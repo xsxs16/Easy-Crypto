@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto_Archive</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="scanlines">
+    <div class="grid-bg"></div>
+    
+    <div class="container">
+        <header>
+            <div class="status-pill">
+                <span class="pulse"></span>
+                SYSTEM ONLINE
+            </div>
+            <h1>Crypto<span>_</span>Archive</h1>
+            <p class="hero-text">
+                Willkommen! Hier findest du regelmäßig neue, kostenlose Guides zu Technik und Lernen.
+                <br>
+                <small>Alle Inhalte sind frei zugänglich – Spenden sind freiwillig.</small>
+            </p>
+        </header>
+
+        <section class="guides-section">
+            <div class="section-header">
+                <div class="header-main">
+                    <span class="icon">💾</span>
+                    <h2>Guide_Database</h2>
+                </div>
+                <div class="record-count">2 RECORDS FOUND</div>
+            </div>
+            
+            <div class="guides-grid">
+                <div class="guide-card" onclick="openGuide(0)">
+                    <div class="card-header">
+                        <span class="lang">DE</span>
+                        <span class="icon">⚙️</span>
+                    </div>
+                    <h3>Crypto Guide für Anfänger – Deutsch</h3>
+                    <div class="card-footer">
+                        <span>ACCESS_FILE</span>
+                        <span>>>></span>
+                    </div>
+                </div>
+
+                <div class="guide-card" onclick="openGuide(1)">
+                    <div class="card-header">
+                        <span class="lang">EN</span>
+                        <span class="icon">⚙️</span>
+                    </div>
+                    <h3>Crypto Beginner Guide – English</h3>
+                    <div class="card-footer">
+                        <span>ACCESS_FILE</span>
+                        <span>>>></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="donation-section">
+            <h2>FREIWILLIGE SPENDE</h2>
+            <p class="disclaimer">Spenden sind eine ausdrücklich freiwillige Unterstützung für das Projekt.</p>
+            
+            <div class="crypto-grid">
+                <div class="crypto-card">
+                    <label>ETHEREUM (ETH)</label>
+                    <div class="address" id="eth-addr">0x28eEfFD722F3e209189cbB102211FEaE8879eC98</div>
+                    <button onclick="copyAddr('eth-addr', this)">KOPIEREN</button>
+                </div>
+                <div class="crypto-card">
+                    <label>SOLANA (SOL)</label>
+                    <div class="address" id="sol-addr">HtfwXYPBsqsb51ZqADXP7Tm5mRwAaPz4ErZFRahxcErY</div>
+                    <button onclick="copyAddr('sol-addr', this)">KOPIEREN</button>
+                </div>
+                <div class="crypto-card">
+                    <label>BITCOIN (BTC)</label>
+                    <div class="address" id="btc-addr">bc1q4ug9y65u7kwz9rt2j7jg5h9r2snuzrlzkmn0vf</div>
+                    <button onclick="copyAddr('btc-addr', this)">KOPIEREN</button>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <p>© 2026 CRYPTO_ARCHIVE_SYSTEM. ALL RIGHTS RESERVED.</p>
+            <p>INITIATED SECURE CONNECTION...</p>
+        </footer>
+    </div>
+
+    <!-- Modal -->
+    <div id="guideModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="header-left">
+                    <span>📟</span>
+                    <span>GUIDE_VIEWER_V1.0</span>
+                </div>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Content injected by JS -->
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

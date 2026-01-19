@@ -1,0 +1,289 @@
+:root {
+    --bg: #0a0a0a;
+    --primary: #00ff41;
+    --text-dim: rgba(0, 255, 65, 0.6);
+    --border: rgba(0, 255, 65, 0.3);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+body {
+    background-color: var(--bg);
+    color: var(--primary);
+    overflow-x: hidden;
+}
+
+/* Scanlines Effect */
+.scanlines::before {
+    content: " ";
+    display: block;
+    position: fixed;
+    top: 0; left: 0; bottom: 0; right: 0;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+    z-index: 1000;
+    background-size: 100% 2px, 3px 100%;
+    pointer-events: none;
+    opacity: 0.1;
+}
+
+.grid-bg {
+    position: fixed;
+    inset: 0;
+    opacity: 0.05;
+    background-image: linear-gradient(var(--primary) 1px, transparent 1px), linear-gradient(90deg, var(--primary) 1px, transparent 1px);
+    background-size: 30px 30px;
+    pointer-events: none;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem;
+    position: relative;
+    z-index: 10;
+}
+
+/* Header */
+header {
+    text-align: center;
+    margin-bottom: 5rem;
+    padding-top: 3rem;
+}
+
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: 1px solid var(--border);
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    margin-bottom: 1.5rem;
+}
+
+.pulse {
+    width: 8px;
+    height: 8px;
+    background-color: var(--primary);
+    border-radius: 50%;
+    animation: pulse-animation 2s infinite;
+}
+
+@keyframes pulse-animation {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 255, 65, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(0, 255, 65, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 255, 65, 0); }
+}
+
+h1 {
+    font-size: 4rem;
+    letter-spacing: -2px;
+    text-transform: uppercase;
+    text-shadow: 0 0 10px var(--primary);
+}
+
+h1 span { color: white; }
+
+.hero-text {
+    max-width: 600px;
+    margin: 1.5rem auto;
+    color: var(--text-dim);
+}
+
+.hero-text small {
+    display: block;
+    margin-top: 1rem;
+    opacity: 0.8;
+}
+
+/* Guides Section */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1rem;
+    margin-bottom: 2rem;
+}
+
+.header-main {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.header-main h2 { text-transform: uppercase; letter-spacing: 2px; }
+
+.record-count { font-size: 0.7rem; color: var(--text-dim); }
+
+.guides-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 5rem;
+}
+
+.guide-card {
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    background: rgba(0, 255, 65, 0.02);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.guide-card:hover {
+    border-color: var(--primary);
+    background: rgba(0, 255, 65, 0.05);
+    box-shadow: 0 0 15px rgba(0, 255, 65, 0.1);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.lang {
+    font-size: 0.7rem;
+    border: 1px solid var(--border);
+    padding: 0.2rem 0.5rem;
+}
+
+.guide-card h3 {
+    font-size: 1.25rem;
+    margin-bottom: 2rem;
+    color: white;
+}
+
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.7rem;
+    margin-top: auto;
+    color: var(--text-dim);
+}
+
+/* Donation */
+.donation-section {
+    text-align: center;
+    border-top: 1px solid var(--border);
+    padding-top: 4rem;
+}
+
+.donation-section h2 { margin-bottom: 1rem; }
+
+.disclaimer { color: var(--text-dim); font-size: 0.8rem; margin-bottom: 3rem; }
+
+.crypto-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.crypto-card {
+    background: #000;
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    text-align: left;
+}
+
+.crypto-card label {
+    display: block;
+    color: var(--primary);
+    font-size: 0.7rem;
+    margin-bottom: 0.5rem;
+}
+
+.address {
+    font-size: 0.75rem;
+    word-break: break-all;
+    color: #ccc;
+    background: #050505;
+    padding: 0.5rem;
+    border: 1px dashed #333;
+    margin-bottom: 0.75rem;
+}
+
+button {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 0.3rem 0.7rem;
+    font-size: 0.7rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+button:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+footer {
+    margin-top: 5rem;
+    text-align: center;
+    padding: 2rem 0;
+    border-top: 1px solid rgba(0, 255, 65, 0.1);
+    color: rgba(0, 255, 65, 0.2);
+    font-size: 0.7rem;
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 2000;
+    padding: 2rem;
+}
+
+.modal-content {
+    max-width: 800px;
+    margin: 0 auto;
+    background: #050505;
+    border: 1px solid var(--primary);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-header {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(0, 255, 65, 0.05);
+}
+
+.header-left { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; }
+
+.close { font-size: 1.5rem; cursor: pointer; color: var(--text-dim); }
+
+.modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 2rem;
+    color: var(--primary); /* GREEN TEXT as requested */
+    line-height: 1.6;
+    font-size: 1.1rem;
+}
+
+.modal-body h2 { color: white; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem; }
+
+.modal-body pre { white-space: pre-wrap; word-wrap: break-word; }
+
+/* Responsive */
+@media (max-width: 768px) {
+    h1 { font-size: 2.5rem; }
+    .container { padding: 1rem; }
+}
