@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Archiv & Spenden</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0a0a0a;
+            --text-color: #e0e0e0;
+            --primary-color: #00ff41;
+            --accent-color: #1a1a1a;
+            --border-color: #333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Scanline Effect */
+        body::before {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 100;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+            opacity: 0.1;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            padding-top: 6rem; /* Platz für den fixierten Button */
+        }
+
+        /* Navigation Button */
+        .archive-btn {
+            position: fixed;
+            top: 2rem;
+            left: 2rem;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            z-index: 1000;
+            text-transform: uppercase;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.2);
+        }
+
+        .archive-btn:hover {
+            background: var(--primary-color);
+            color: #000;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.5);
+        }
+
+        /* Views Management */
+        .view-section {
+            display: none; /* Standardmäßig alle ausblenden */
+            animation: fadeIn 0.5s ease;
+        }
+
+        .view-section.active {
+            display: block; /* Nur aktives Element zeigen */
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Home View Styles */
+        .home-header {
+            height: 60vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 2rem;
+            letter-spacing: -2px;
+            text-transform: uppercase;
+            color: #fff;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        .hero-text {
+            font-size: 1.25rem;
+            border-left: 3px solid var(--primary-color);
+            padding-left: 1.5rem;
+            text-align: left;
+            margin-bottom: 2rem;
+            max-width: 600px;
+        }
+
+        /* List View Styles */
+        .list-header {
+            color: var(--primary-color);
+            text-transform: uppercase;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
+        }
+
+        .article-link {
+            display: block;
+            background: var(--accent-color);
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .article-link:hover {
+            border-color: var(--primary-color);
+            background: rgba(0, 255, 65, 0.05);
+            transform: translateX(10px);
+        }
+
+        .article-link h3 {
+            color: #fff;
+            margin-bottom: 0.5rem;
+        }
+
+        .article-link span {
+            color: #888;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        /* Full Article View Styles */
+        .article-content {
+            background: var(--accent-color);
+            padding: 2.5rem;
+            border: 1px solid var(--border-color);
+            margin-bottom: 3rem;
+        }
+
+        .article-content h2 {
+            color: #007bff;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid #333;
+            padding-bottom: 1rem;
+            font-size: 1.8rem;
+        }
+
+        .article-section {
+            margin-bottom: 2rem;
+        }
+
+        .article-section strong {
+            color: var(--primary-color);
+            display: block;
+            margin-bottom: 0.8rem;
+            font-size: 1.1rem;
+        }
+
+        .article-section p, .article-section ul {
+            color: #ccc;
+            font-size: 0.95rem;
+            padding-left: 1rem;
+            border-left: 1px solid #333;
+        }
+
+        .article-section ul {
+            list-style: none;
+        }
+
+        .article-section li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .article-section li::before {
+            content: "> ";
+            color: #555;
+        }
+
+        .disclaimer {
+            text-align: center;
+            color: #ff4141;
+            font-size: 0.8rem;
+            margin-top: 3rem;
+            border-top: 1px dashed #333;
+            padding-top: 1rem;
+        }
+
+        /* Donations Styles */
+        .donation-section {
+            padding: 3rem 0;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .crypto-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .crypto-card {
+            background: #000;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            text-align: left;
+        }
+
+        .crypto-label {
+            color: var(--primary-color);
+            font-size: 0.8rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .crypto-address {
+            font-size: 0.7rem;
+            word-break: break-all;
+            color: #ccc;
+            padding: 0.5rem;
+            background: #111;
+            display: block;
+            margin-top: 0.5rem;
+            border: 1px dashed #444;
+        }
+
+        .copy-btn {
+            margin-top: 0.8rem;
+            background: transparent;
+            border: 1px solid #444;
+            color: #888;
+            padding: 0.4rem 0.8rem;
+            font-size: 0.7rem;
+            cursor: pointer;
+            width: 100%;
+            text-transform: uppercase;
+        }
+
+        .copy-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin-bottom: 1rem;
+            color: #888;
+            cursor: pointer;
+            text-decoration: underline;
+            font-size: 0.9rem;
+        }
+        
+        .back-btn:hover {
+            color: var(--primary-color);
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2.2rem; }
+            .hero-text { font-size: 1rem; }
+            .container { padding: 1rem; padding-top: 5rem; }
+            .article-content { padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <button id="mainBtn" class="archive-btn" onclick="toggleView()">ARCHIV_ÖFFNEN</button>
+
+    <div class="container">
+        
+        <div id="homeView" class="view-section active">
+            <header class="home-header">
+                <h1>Willkommen!</h1>
+                <div class="hero-text">
+                    Hier findest du regelmäßig neue, kostenlose Guides zu Technik und Lernen.
+                </div>
+                <div style="color: var(--primary-color); opacity: 0.8; letter-spacing: 2px; font-size: 0.9rem;">
+                    KEINE PDFS ERFORDERLICH - ALLES DIREKT ONLINE.
+                </div>
+            </header>
+        </div>
+
+        <div id="listView" class="view-section">
+            <h2 class="list-header">Verfügbare Guides</h2>
+            
+            <div class="article-link" onclick="openArticle('de')">
+                <h3>Crypto Guide für Anfänger</h3>
+                <span>Sprache: DEUTSCH</span>
+            </div>
+
+            <div class="article-link" onclick="openArticle('en')">
+                <h3>Crypto Beginner Guide</h3>
+                <span>Language: ENGLISH</span>
+            </div>
+        </div>
+
+        <div id="articleView" class="view-section">
+            <span class="back-btn" onclick="showList()">&lt; ZURÜCK ZUR ÜBERSICHT</span>
+            
+            <div id="articleContainer" class="article-content">
+                </div>
+
+            <section class="donation-section">
+                <h2 style="font-size: 1.5rem; margin-bottom: 1rem;">FREIWILLIGE SPENDE</h2>
+                <p style="color: #888; font-size: 0.9rem;">
+                    Hat dir dieser Guide geholfen? Spenden sind eine freiwillige Unterstützung für das Projekt.
+                </p>
+
+                <div class="crypto-grid">
+                    <div class="crypto-card">
+                        <span class="crypto-label">ETHEREUM (ETH)</span>
+                        <span class="crypto-address" id="eth-addr">0x28eEfFD722F3e209189cbB102211FEaE8879eC98</span>
+                        <button class="copy-btn" onclick="copyToClipboard('eth-addr', this)">ADRESSE KOPIEREN</button>
+                    </div>
+                    <div class="crypto-card">
+                        <span class="crypto-label">SOLANA (SOL)</span>
+                        <span class="crypto-address" id="sol-addr">HtfwXYPBsqsb51ZqADXP7Tm5mRwAaPz4ErZFRahxcErY</span>
+                        <button class="copy-btn" onclick="copyToClipboard('sol-addr', this)">ADRESSE KOPIEREN</button>
+                    </div>
+                    <div class="crypto-card">
+                        <span class="crypto-label">BITCOIN (BTC)</span>
+                        <span class="crypto-address" id="btc-addr">bc1q4ug9y65u7kwz9rt2j7jg5h9r2snuzrlzkmn0vf</span>
+                        <button class="copy-btn" onclick="copyToClipboard('btc-addr', this)">ADRESSE KOPIEREN</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+    </div>
+
+    <script>
+        // Daten für die Artikel
+        const articles = {
+            'de': `
+                <h2>Crypto Guide für Anfänger – Deutsch</h2>
+                
+                <div class="article-section">
+                    <strong>1. Was ist Kryptowährung?</strong>
+                    <ul>
+                        <li>Digitale Währung, die online funktioniert</li>
+                        <li>Kein Bankkonto nötig</li>
+                        <li>Beispiele: Bitcoin (BTC), Ethereum (ETH)</li>
+                    </ul>
+                </div>
+
+                <div class="article-section">
+                    <strong>2. Wie funktioniert die Blockchain?</strong>
+                    <ul>
+                        <li>Eine Kette von Datenblöcken</li>
+                        <li>Jede Transaktion ist sicher und gespeichert</li>
+                        <li>Niemand kann sie einfach ändern</li>
+                    </ul>
+                </div>
+
+                <div class="article-section">
+                    <strong>3. Wallets – Deine digitale Geldbörse</strong>
+                    <ul>
+                        <li>Hot Wallet: Online, einfach, z. B. MetaMask</li>
+                        <li>Cold Wallet: Offline, sicher, z. B. Ledger</li>
+                    </ul>
+                </div>
+
+                <div class="article-section">
+                    <strong>4. So kaufst du Kryptowährungen</strong>
+                    <p>
+                        1. Börse auswählen (z. B. Binance, Coinbase)<br>
+                        2. Konto erstellen & verifizieren<br>
+                        3. Geld einzahlen<br>
+                        4. Coin kaufen
+                    </p>
+                </div>
+
+                <div class="article-section">
+                    <strong>5. Sicherheitstipps</strong>
+                    <ul>
+                        <li>2-Faktor-Authentifizierung aktivieren</li>
+                        <li>Private Keys niemals teilen</li>
+                        <li>Vorsicht vor verdächtigen Links</li>
+                        <li>Erst kleine Beträge testen</li>
+                    </ul>
+                </div>
+
+                <div class="article-section">
+                    <strong>6. Grundlegende Strategien</strong>
+                    <ul>
+                        <li>Hodlen: Coins langfristig halten</li>
+                        <li>Diversifizieren: Nicht alles auf einen Coin setzen</li>
+                        <li>Trading: Kaufen & Verkaufen (erfordert Erfahrung)</li>
+                    </ul>
+                </div>
+
+                <div class="article-section">
+                    <strong>7. Nützliche Begriffe</strong>
+                    <ul>
+                        <li>Altcoins: alle Coins außer Bitcoin</li>
+                        <li>DeFi: dezentrale Finanzsysteme</li>
+                        <li>NFT: digitales Eigentum</li>
+                    </ul>
+                </div>
+
+                <div class="article-section">
+                    <strong>8. Fazit</strong>
+                    <ul>
+                        <li>Kryptowährungen sind spannend, aber riskant</li>
+                        <li>Nur Geld investieren, das du entbehren kannst</li>
+                    </ul>
+                </div>
+
+                <p class="disclaimer">NUR FÜR DEN PRIVATEN GEBRAUCH! NICHT WEITERVERKAUFEN!</p>
+            `,
+            'en': `
+                <h2>Crypto Beginner Guide – English</h2>
+                
+                <div class="article-section">
+                    <strong>1. What is Cryptocurrency?</strong>
+                    <ul>
+                        <li>Digital money that works online</li>
+                        <li>No bank account needed</li>
+                        <li>Examples: Bitcoin (BTC), Ethereum (ETH)</li>
+                    </ul>
+                </div>
+
+                <div class="article-section">
+                    <strong>2. How does Blockchain work?</strong>
+                    <ul>
+                        <li>A chain of data blocks</li>
+                        <li>Every transaction is secure and stored</li>
+                        <li>Nobody can easily change it</li>
+                    </ul>
+                </div>
+
+                <div class="article-section">
+                    <strong>3. Wallets – Your Digital Wallet</strong>
+                    <ul>
+                        <li>Hot Wallet: Online, easy, e.g., MetaMask</li>
+                        <li>Cold Wallet: Offline, safe, e.g., Ledger</li>
+                    </ul>
+                </div>
+
+                <div class="article-section">
+                    <strong>4. How to Buy Cryptocurrencies</strong>
+                    <p>
+                        1. Choose an exchange (e.g., Binance, Coinbase)<br>
+                        2. Create & verify account<br>
+                        3. Deposit money<br>
+                        4. Buy coins
+                    </p>
+                </div>
+
+                <div class="article-section">
+                    <strong>5. Safety Tips</strong>
+                    <ul>
+                        <li>Enable 2-factor authentication</li>
+                        <li>Never share private keys</li>
+                        <li>Be careful with suspicious links</li>
+                        <li>Start with small amounts</li>
+                    </ul>
+                </div>
+
+                <div class="article-section">
+                    <strong>6. Basic Strategies</strong>
+                    <ul>
+                        <li>Hodl: Hold coins long-term</li>
+                        <li>Diversify: Don’t put all in one coin</li>
+                        <li>Trading: Buy & sell (needs experience)</li>
+                    </ul>
+                </div>
+
+                <div class="article-section">
+                    <strong>7. Useful Terms</strong>
+                    <ul>
+                        <li>Altcoins: all coins except Bitcoin</li>
+                        <li>DeFi: decentralized finance systems</li>
+                        <li>NFT: digital ownership</li>
+                    </ul>
+                </div>
+
+                <div class="article-section">
+                    <strong>8. Conclusion</strong>
+                    <ul>
+                        <li>Cryptocurrencies are exciting but risky</li>
+                        <li>Only invest money you can afford to lose</li>
+                    </ul>
+                </div>
+
+                <p class="disclaimer">ONLY FOR PERSONAL USE! DO NOT RESELL!</p>
+            `
+        };
+
+        // Navigation Logic
+        const views = {
+            home: document.getElementById('homeView'),
+            list: document.getElementById('listView'),
+            article: document.getElementById('articleView')
+        };
+        const mainBtn = document.getElementById('mainBtn');
+
+        function hideAllViews() {
+            Object.values(views).forEach(el => el.classList.remove('active'));
+        }
+
+        // Haupt-Button Funktion (Toggle zwischen Home und Archiv Liste)
+        function toggleView() {
+            // Wenn wir gerade Home sehen, geh zur Liste
+            if (views.home.classList.contains('active')) {
+                hideAllViews();
+                views.list.classList.add('active');
+                mainBtn.innerText = "STARTSEITE";
+            } else {
+                // Sonst geh zurück zu Home
+                hideAllViews();
+                views.home.classList.add('active');
+                mainBtn.innerText = "ARCHIV_ÖFFNEN";
+            }
+        }
+
+        function showList() {
+            hideAllViews();
+            views.list.classList.add('active');
+            window.scrollTo(0,0);
+        }
+
+        function openArticle(lang) {
+            hideAllViews();
+            // Text einfügen
+            document.getElementById('articleContainer').innerHTML = articles[lang];
+            // View anzeigen
+            views.article.classList.add('active');
+            window.scrollTo(0,0);
+        }
+
+        function copyToClipboard(elementId, btnElement) {
+            const text = document.getElementById(elementId).innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = btnElement.innerText;
+                btnElement.innerText = 'KOPIERT!';
+                btnElement.style.color = '#fff';
+                btnElement.style.borderColor = '#fff';
+                
+                setTimeout(() => {
+                    btnElement.innerText = originalText;
+                    btnElement.style.color = '';
+                    btnElement.style.borderColor = '';
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>
